@@ -36,16 +36,16 @@ This platform bridges the warm, human touch of handmade Indian craftsmanship wit
 Designed and built with modern software engineering principles, the codebase emphasizes separation of concerns, defensive programming, and seamless user experiences.
 
 ```mermaid
-graph TD
-    A[Customer Browser / Client] -->|Browse & Filter| B[Next.js 14 App Router]
-    A -->|Global State & Cart| C[Zustand Store + LocalStorage]
-    A -->|Checkout / Payment| D[Razorpay Standard Web SDK]
-    D -->|HMAC-SHA256 Signature| E[API /api/verify-payment]
-    E -->|Sync Order Record| F[Multi-Tier Data Layer]
-    F -->|Relational Persistence| G[(Supabase PostgreSQL)]
-    F -->|Instant Client Cache| C
-    H[Studio Admin] -->|Isolated Auth Gate| I[/admin Control Center]
-    I -->|Manage Inventory & Lifecycle| F
+flowchart TD
+    A["Customer Browser / Client"] -->|"Browse & Filter"| B["Next.js 14 App Router"]
+    A -->|"Global State & Cart"| C["Zustand Store + LocalStorage"]
+    A -->|"Checkout / Payment"| D["Razorpay Standard Web SDK"]
+    D -->|"HMAC-SHA256 Signature"| E["API: /api/verify-payment"]
+    E -->|"Sync Order Record"| F["Multi-Tier Data Layer"]
+    F -->|"Relational Persistence"| G[("Supabase PostgreSQL")]
+    F -->|"Instant Client Cache"| C
+    H["Studio Admin"] -->|"Isolated Auth Gate"| I["Studio Admin Control Center"]
+    I -->|"Manage Inventory & Lifecycle"| F
 ```
 
 ### 1. Multi-Tier Resilient Data Layer (`src/lib/data-service.ts`)
