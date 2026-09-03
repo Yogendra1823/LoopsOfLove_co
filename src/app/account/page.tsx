@@ -38,7 +38,7 @@ export default function AccountPage() {
     getProducts().then((data) => setProducts(data));
 
     const loadCustomerOrders = () => {
-      const email = authUser?.email || (typeof window !== 'undefined' ? (localStorage.getItem('user_email') || localStorage.getItem('admin_email')) : '');
+      const email = authUser?.email || (typeof window !== 'undefined' ? (sessionStorage.getItem('user_email') || sessionStorage.getItem('admin_email')) : '');
       if (email) {
         setLoadingOrders(true);
         getOrdersByCustomerEmail(email)
@@ -67,6 +67,8 @@ export default function AccountPage() {
     }
     clearSession();
     if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('user_email');
+      sessionStorage.removeItem('user_name');
       sessionStorage.removeItem('admin_authenticated');
       sessionStorage.removeItem('admin_email');
       localStorage.removeItem('admin_authenticated');

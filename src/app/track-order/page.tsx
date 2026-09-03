@@ -31,8 +31,8 @@ function TrackOrderContent() {
 
   const [isAuthed, setIsAuthed] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
-    const localEmail = localStorage.getItem('user_email') || localStorage.getItem('admin_email');
-    return !!(localEmail || authUser?.email);
+    const sessionEmail = sessionStorage.getItem('user_email') || sessionStorage.getItem('admin_email');
+    return !!(sessionEmail || authUser?.email);
   });
 
   const [orderIdInput, setOrderIdInput] = useState(queryId);
@@ -45,8 +45,8 @@ function TrackOrderContent() {
   useEffect(() => {
     const loadTrackOrders = () => {
       if (typeof window !== 'undefined') {
-        const localEmail = localStorage.getItem('user_email') || localStorage.getItem('admin_email');
-        const email = authUser?.email || localEmail;
+        const sessionEmail = sessionStorage.getItem('user_email') || sessionStorage.getItem('admin_email');
+        const email = authUser?.email || sessionEmail;
         setIsAuthed(!!email);
 
         if (email) {

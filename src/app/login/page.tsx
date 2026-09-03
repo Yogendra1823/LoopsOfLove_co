@@ -33,9 +33,17 @@ function LoginContent() {
   // ── Redirect if already logged in ──────────────────────────────────────────
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    // Purge any old persistent localStorage logins
+    localStorage.removeItem('admin_authenticated');
+    localStorage.removeItem('admin_email');
+    localStorage.removeItem('user_authenticated');
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_name');
+
     const adminAuth = sessionStorage.getItem('admin_authenticated') === 'true';
     const adminEmail = sessionStorage.getItem('admin_email');
-    const userEmail = localStorage.getItem('user_email');
+    const userEmail = sessionStorage.getItem('user_email');
 
     if (adminAuth && adminEmail && ADMIN_EMAILS.includes(adminEmail.toLowerCase())) {
       router.replace('/admin');
@@ -87,6 +95,9 @@ function LoginContent() {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('admin_authenticated');
           localStorage.removeItem('admin_email');
+          localStorage.removeItem('user_authenticated');
+          localStorage.removeItem('user_email');
+          localStorage.removeItem('user_name');
 
           sessionStorage.setItem('admin_authenticated', 'true');
           sessionStorage.setItem('admin_email', cleanEmail);
@@ -117,8 +128,12 @@ function LoginContent() {
 
         const customerName = fullName || cleanEmail.split('@')[0];
         if (typeof window !== 'undefined') {
-          localStorage.setItem('user_email', cleanEmail);
-          localStorage.setItem('user_name', customerName);
+          localStorage.removeItem('user_authenticated');
+          localStorage.removeItem('user_email');
+          localStorage.removeItem('user_name');
+
+          sessionStorage.setItem('user_email', cleanEmail);
+          sessionStorage.setItem('user_name', customerName);
           window.dispatchEvent(new Event('auth-change'));
         }
         setAuthUser({ email: cleanEmail, name: customerName, isAdmin: false });
@@ -139,6 +154,9 @@ function LoginContent() {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('admin_authenticated');
           localStorage.removeItem('admin_email');
+          localStorage.removeItem('user_authenticated');
+          localStorage.removeItem('user_email');
+          localStorage.removeItem('user_name');
 
           sessionStorage.setItem('admin_authenticated', 'true');
           sessionStorage.setItem('admin_email', cleanEmail);
@@ -155,8 +173,12 @@ function LoginContent() {
         // Local fallback authentication for customer convenience
         const customerName = cleanEmail.split('@')[0];
         if (typeof window !== 'undefined') {
-          localStorage.setItem('user_email', cleanEmail);
-          localStorage.setItem('user_name', customerName);
+          localStorage.removeItem('user_authenticated');
+          localStorage.removeItem('user_email');
+          localStorage.removeItem('user_name');
+
+          sessionStorage.setItem('user_email', cleanEmail);
+          sessionStorage.setItem('user_name', customerName);
           window.dispatchEvent(new Event('auth-change'));
         }
         setAuthUser({ email: cleanEmail, name: customerName, isAdmin: false });
@@ -167,8 +189,12 @@ function LoginContent() {
 
       const customerName = data.user?.user_metadata?.full_name || cleanEmail.split('@')[0];
       if (typeof window !== 'undefined') {
-        localStorage.setItem('user_email', cleanEmail);
-        localStorage.setItem('user_name', customerName);
+        localStorage.removeItem('user_authenticated');
+        localStorage.removeItem('user_email');
+        localStorage.removeItem('user_name');
+
+        sessionStorage.setItem('user_email', cleanEmail);
+        sessionStorage.setItem('user_name', customerName);
         window.dispatchEvent(new Event('auth-change'));
       }
       setAuthUser({ email: cleanEmail, name: customerName, isAdmin: false });

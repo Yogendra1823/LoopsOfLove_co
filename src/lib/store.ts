@@ -65,11 +65,11 @@ export const useAppStore = create<AppState>()(
       setAuthUser: (user) => set({ authUser: user }),
 
       addToCart: (product, quantity = 1, variant) => {
-        // Enforce user must be logged in to add to cart
+        // Enforce user must be logged in to add to cart (using ephemeral sessionStorage)
         const currentAuth = get().authUser;
-        const localEmail = typeof window !== 'undefined' ? (localStorage.getItem('user_email') || localStorage.getItem('admin_email')) : null;
+        const sessionEmail = typeof window !== 'undefined' ? (sessionStorage.getItem('user_email') || sessionStorage.getItem('admin_email')) : null;
         
-        if (!currentAuth?.email && !localEmail) {
+        if (!currentAuth?.email && !sessionEmail) {
           get().addToast('error', 'Please sign in to add items to your cart.');
           if (typeof window !== 'undefined') {
             const currentPath = window.location.pathname;
@@ -133,6 +133,8 @@ export const useAppStore = create<AppState>()(
         set({ cart: [], wishlist: [], appliedCoupon: null, authUser: null });
         // Also nuke persisted storage entries
         if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('user_email');
+          sessionStorage.removeItem('user_name');
           sessionStorage.removeItem('admin_email');
           sessionStorage.removeItem('admin_authenticated');
           localStorage.removeItem('loops-of-love-storage');
@@ -147,9 +149,9 @@ export const useAppStore = create<AppState>()(
       toggleWishlist: (productId) => {
         // Enforce user must be logged in to wishlist items
         const currentAuth = get().authUser;
-        const localEmail = typeof window !== 'undefined' ? (localStorage.getItem('user_email') || localStorage.getItem('admin_email')) : null;
+        const sessionEmail = typeof window !== 'undefined' ? (sessionStorage.getItem('user_email') || sessionStorage.getItem('admin_email')) : null;
         
-        if (!currentAuth?.email && !localEmail) {
+        if (!currentAuth?.email && !sessionEmail) {
           get().addToast('error', 'Please sign in to save items to your wishlist.');
           if (typeof window !== 'undefined') {
             const currentPath = window.location.pathname;

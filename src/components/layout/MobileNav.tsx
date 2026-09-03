@@ -17,8 +17,8 @@ export function MobileNav() {
     if (typeof window !== 'undefined') {
       const adminAuth = sessionStorage.getItem('admin_authenticated') === 'true';
       const adminEmail = sessionStorage.getItem('admin_email');
-      const userEmail = localStorage.getItem('user_email');
-      const userName = localStorage.getItem('user_name');
+      const userEmail = sessionStorage.getItem('user_email');
+      const userName = sessionStorage.getItem('user_name');
 
       if (adminAuth && adminEmail && ADMIN_EMAILS.includes(adminEmail.toLowerCase())) {
         if (!authUser || !authUser.isAdmin) {

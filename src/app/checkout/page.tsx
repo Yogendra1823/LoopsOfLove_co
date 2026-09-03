@@ -22,8 +22,8 @@ export default function CheckoutPage() {
 
   const [isAuthed, setIsAuthed] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
-    const localEmail = localStorage.getItem('user_email') || localStorage.getItem('admin_email');
-    return !!(localEmail || authUser?.email);
+    const sessionEmail = sessionStorage.getItem('user_email') || sessionStorage.getItem('admin_email');
+    return !!(sessionEmail || authUser?.email);
   });
 
   const [formData, setFormData] = useState({
@@ -40,15 +40,15 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const localEmail = localStorage.getItem('user_email') || localStorage.getItem('admin_email');
-      const localName = localStorage.getItem('user_name');
-      const authed = !!(localEmail || authUser?.email);
+      const sessionEmail = sessionStorage.getItem('user_email') || sessionStorage.getItem('admin_email');
+      const sessionName = sessionStorage.getItem('user_name');
+      const authed = !!(sessionEmail || authUser?.email);
       setIsAuthed(authed);
       if (authed) {
         setFormData((prev) => ({
           ...prev,
-          email: prev.email || authUser?.email || localEmail || '',
-          fullName: prev.fullName || authUser?.name || localName || '',
+          email: prev.email || authUser?.email || sessionEmail || '',
+          fullName: prev.fullName || authUser?.name || sessionName || '',
         }));
       }
     }
