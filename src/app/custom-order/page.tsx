@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/store';
 import { createCustomOrderRecord } from '@/lib/data-service';
 import { Button } from '@/components/ui/Button';
-import { Sparkles, Send, CheckCircle2, Lock, User, ArrowRight } from 'lucide-react';
+import { Sparkles, Send, CheckCircle2, Lock, User, ArrowRight, UploadCloud, Link as LinkIcon, Trash2, Check } from 'lucide-react';
 
 export default function CustomOrderPage() {
   const router = useRouter();
@@ -20,6 +20,10 @@ export default function CustomOrderPage() {
 
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload');
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [formData, setFormData] = useState({
     name: authUser?.name || '',
     phone: '',
@@ -28,6 +32,7 @@ export default function CustomOrderPage() {
     budget: '1000-2000',
     description: '',
     referenceUrl: '',
+    referenceImage: '',
   });
 
   useEffect(() => {
@@ -47,6 +52,44 @@ export default function CustomOrderPage() {
     }
   }, [authUser]);
 
+  const handleFileChange = (file: File) => {
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      addToast('error', 'Please select a valid image file (JPG, PNG, WebP).');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      addToast('error', 'File size exceeds 5MB. Please choose a smaller image.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      if (dataUrl) {
+        setFormData((prev) => ({
+          ...prev,
+          referenceImage: dataUrl,
+        }));
+        addToast('success', 'Reference photo attached!');
+      }
+    };
+    reader.onerror = () => {
+      addToast('error', 'Failed to read file.');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFileChange(e.dataTransfer.files[0]);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -63,12 +106,13 @@ export default function CustomOrderPage() {
 
     setLoading(true);
     try {
+      const referenceData = formData.referenceUrl || (formData.referenceImage ? '[Attached Photo Uploaded]' : '');
       await createCustomOrderRecord({
         customer_name: formData.name,
         customer_phone: formData.phone,
         customer_email: formData.email,
         idea_description: `[Category: ${formData.category}] ${formData.description}${
-          formData.referenceUrl ? ` (Reference: ${formData.referenceUrl})` : ''
+          referenceData ? ` (Reference: ${referenceData})` : ''
         }`,
         target_budget: Number(formData.budget.split('-')[0]) || 1000,
       });
@@ -208,15 +252,88 @@ export default function CustomOrderPage() {
               />
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Reference Image Link (Pinterest / Instagram / Drive)</label>
-              <input
-                type="url"
-                value={formData.referenceUrl}
-                onChange={(e) => setFormData({ ...formData, referenceUrl: e.target.value })}
-                placeholder="https://..."
-                className="w-full px-3.5 py-2.5 text-xs bg-[#FAF4E8] border border-[#E8DEC9] rounded-xl focus:outline-none focus:border-[#C86D51]"
-              />
+            {/* Reference Image / File Upload Section */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="block text-xs font-semibold text-gray-700">Reference Photo / Design Link (Optional)</label>
+                <div className="flex items-center gap-1 bg-[#FAF4E8] p-1 rounded-xl border border-[#E8DEC9] text-[11px]">
+                  <button
+                    type="button"
+                    onClick={() => setImageMode('upload')}
+                    className={`px-3 py-1 rounded-lg font-medium transition-all flex items-center gap-1 ${
+                      imageMode === 'upload' ? 'bg-[#C86D51] text-white shadow-xs' : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <UploadCloud className="w-3.5 h-3.5" /> Upload Photo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setImageMode('url')}
+                    className={`px-3 py-1 rounded-lg font-medium transition-all flex items-center gap-1 ${
+                      imageMode === 'url' ? 'bg-[#C86D51] text-white shadow-xs' : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <LinkIcon className="w-3.5 h-3.5" /> Web Link
+                  </button>
+                </div>
+              </div>
+
+              {imageMode === 'upload' ? (
+                <div
+                  onDrop={handleDrop}
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`cursor-pointer border-2 border-dashed rounded-2xl p-4 text-center transition-all ${
+                    isDragging ? 'border-[#C86D51] bg-[#C86D51]/10' : 'border-[#E8DEC9] bg-[#FAF4E8]/50 hover:bg-[#FAF4E8]'
+                  }`}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleFileChange(e.target.files[0]);
+                      }
+                    }}
+                  />
+                  <UploadCloud className="w-6 h-6 text-[#C86D51] mx-auto mb-1" />
+                  <p className="font-semibold text-gray-800 text-xs">Choose photo from phone / computer or drag & drop</p>
+                  <p className="text-[10px] text-gray-500">Supports PNG, JPG, WebP (Max 5MB)</p>
+                </div>
+              ) : (
+                <input
+                  type="url"
+                  value={formData.referenceUrl}
+                  onChange={(e) => setFormData({ ...formData, referenceUrl: e.target.value })}
+                  placeholder="https://pinterest.com/... or https://instagram.com/..."
+                  className="w-full px-3.5 py-2.5 text-xs bg-[#FAF4E8] border border-[#E8DEC9] rounded-xl focus:outline-none focus:border-[#C86D51]"
+                />
+              )}
+
+              {formData.referenceImage && (
+                <div className="flex items-center gap-3 p-3 bg-[#FAF4E8] rounded-2xl border border-[#E8DEC9]">
+                  <div className="w-12 h-12 rounded-xl bg-white border border-[#E8DEC9] overflow-hidden shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={formData.referenceImage} alt="Reference Preview" className="w-full h-full object-cover" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-800 text-xs">Reference Photo Attached</p>
+                    <p className="text-[10px] text-emerald-600 flex items-center gap-1 font-medium mt-0.5">
+                      <Check className="w-3 h-3" /> Ready to submit with your request
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, referenceImage: '' })}
+                    className="p-1.5 text-gray-400 hover:text-rose-600 rounded-lg hover:bg-white transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
 
             <Button type="submit" isLoading={loading} className="w-full py-3.5 text-sm font-semibold flex items-center justify-center gap-2">
