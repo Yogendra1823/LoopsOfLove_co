@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -16,6 +16,20 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Purge any legacy localStorage admin keys
+      localStorage.removeItem('admin_authenticated');
+      localStorage.removeItem('admin_email');
+
+      const isAuth = sessionStorage.getItem('admin_authenticated') === 'true';
+      const adminEmail = sessionStorage.getItem('admin_email');
+      if (isAuth && adminEmail && ALLOWED_ADMINS[adminEmail.toLowerCase()]) {
+        router.replace('/admin');
+      }
+    }
+  }, [router]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,11 +51,16 @@ export default function AdminLoginPage() {
       return;
     }
 
-    // Set admin session flag in localStorage & cookies
+    // Set ephemeral admin session flag in sessionStorage (destroyed on tab/browser close)
     if (typeof window !== 'undefined') {
-      localStorage.setItem('admin_authenticated', 'true');
-      localStorage.setItem('admin_email', cleanEmail);
-      document.cookie = `admin_session=true; path=/; max-age=86400`;
+      localStorage.removeItem('admin_authenticated');
+      localStorage.removeItem('admin_email');
+
+      sessionStorage.setItem('admin_authenticated', 'true');
+      sessionStorage.setItem('admin_email', cleanEmail);
+      
+      // True session cookie without max-age/expires (destroyed on browser close)
+      document.cookie = `admin_session=true; path=/; SameSite=Strict`;
       window.dispatchEvent(new Event('auth-change'));
     }
 
@@ -94,7 +113,7 @@ export default function AdminLoginPage() {
           </div>
 
           <Button type="submit" isLoading={loading} className="w-full py-3 text-xs font-semibold">
-            Sign In to Admin Dashboard
+            Sign In to Admin
           </Button>
         </form>
       </div>

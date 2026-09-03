@@ -15,8 +15,8 @@ export function MobileNav() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const adminAuth = localStorage.getItem('admin_authenticated') === 'true';
-      const adminEmail = localStorage.getItem('admin_email');
+      const adminAuth = sessionStorage.getItem('admin_authenticated') === 'true';
+      const adminEmail = sessionStorage.getItem('admin_email');
       const userEmail = localStorage.getItem('user_email');
       const userName = localStorage.getItem('user_name');
 
@@ -36,6 +36,14 @@ export function MobileNav() {
     try { await signOut(); } catch (_) { /* ignore */ }
     clearSession();
     if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('admin_authenticated');
+      sessionStorage.removeItem('admin_email');
+      localStorage.removeItem('admin_authenticated');
+      localStorage.removeItem('admin_email');
+      localStorage.removeItem('user_authenticated');
+      localStorage.removeItem('user_email');
+      localStorage.removeItem('user_name');
+      document.cookie = 'admin_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       window.dispatchEvent(new Event('auth-change'));
     }
     setMobileMenuOpen(false);

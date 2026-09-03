@@ -37,7 +37,7 @@ export function AdminHeader() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const email = localStorage.getItem('admin_email');
+      const email = sessionStorage.getItem('admin_email');
       if (email) setAdminEmail(email);
     }
   }, []);
@@ -52,12 +52,14 @@ export function AdminHeader() {
     clearSession();
 
     if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('admin_authenticated');
+      sessionStorage.removeItem('admin_email');
       localStorage.removeItem('admin_authenticated');
       localStorage.removeItem('admin_email');
       localStorage.removeItem('user_authenticated');
       localStorage.removeItem('user_email');
       localStorage.removeItem('user_name');
-      document.cookie = 'admin_session=; path=/; max-age=0';
+      document.cookie = 'admin_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       window.dispatchEvent(new Event('auth-change'));
     }
 

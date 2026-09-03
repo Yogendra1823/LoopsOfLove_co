@@ -33,8 +33,8 @@ function LoginContent() {
   // ── Redirect if already logged in ──────────────────────────────────────────
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const adminAuth = localStorage.getItem('admin_authenticated') === 'true';
-    const adminEmail = localStorage.getItem('admin_email');
+    const adminAuth = sessionStorage.getItem('admin_authenticated') === 'true';
+    const adminEmail = sessionStorage.getItem('admin_email');
     const userEmail = localStorage.getItem('user_email');
 
     if (adminAuth && adminEmail && ADMIN_EMAILS.includes(adminEmail.toLowerCase())) {
@@ -83,11 +83,14 @@ function LoginContent() {
           return;
         }
 
-        // Store Admin Session
+        // Store Admin Ephemeral Session (cleared on browser/tab close)
         if (typeof window !== 'undefined') {
-          localStorage.setItem('admin_authenticated', 'true');
-          localStorage.setItem('admin_email', cleanEmail);
-          document.cookie = `admin_session=true; path=/; max-age=86400`;
+          localStorage.removeItem('admin_authenticated');
+          localStorage.removeItem('admin_email');
+
+          sessionStorage.setItem('admin_authenticated', 'true');
+          sessionStorage.setItem('admin_email', cleanEmail);
+          document.cookie = `admin_session=true; path=/; SameSite=Strict`;
           window.dispatchEvent(new Event('auth-change'));
         }
         setAuthUser({ email: cleanEmail, name: 'Admin', isAdmin: true });
@@ -134,9 +137,12 @@ function LoginContent() {
       // If user is one of the admins logging in through customer tab, recognize them
       if (ADMIN_CREDENTIALS[cleanEmail] && password === ADMIN_CREDENTIALS[cleanEmail]) {
         if (typeof window !== 'undefined') {
-          localStorage.setItem('admin_authenticated', 'true');
-          localStorage.setItem('admin_email', cleanEmail);
-          document.cookie = `admin_session=true; path=/; max-age=86400`;
+          localStorage.removeItem('admin_authenticated');
+          localStorage.removeItem('admin_email');
+
+          sessionStorage.setItem('admin_authenticated', 'true');
+          sessionStorage.setItem('admin_email', cleanEmail);
+          document.cookie = `admin_session=true; path=/; SameSite=Strict`;
           window.dispatchEvent(new Event('auth-change'));
         }
         setAuthUser({ email: cleanEmail, name: 'Admin', isAdmin: true });

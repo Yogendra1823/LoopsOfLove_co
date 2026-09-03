@@ -10,12 +10,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
   const router = useRouter();
 
-  // Instant synchronous initialization (0ms lag)
+  // Instant synchronous check using sessionStorage (automatically cleared on browser/tab close)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
     if (pathname === '/admin/login') return true;
-    const isAuth = localStorage.getItem('admin_authenticated') === 'true';
-    const email = localStorage.getItem('admin_email');
+    
+    // Purge any legacy localStorage admin keys for maximum security
+    localStorage.removeItem('admin_authenticated');
+    localStorage.removeItem('admin_email');
+
+    const isAuth = sessionStorage.getItem('admin_authenticated') === 'true';
+    const email = sessionStorage.getItem('admin_email');
     return !!(isAuth && email && ADMIN_EMAILS.includes(email.toLowerCase()));
   });
 
@@ -26,8 +31,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
 
     if (typeof window !== 'undefined') {
-      const isAuth = localStorage.getItem('admin_authenticated') === 'true';
-      const email = localStorage.getItem('admin_email');
+      // Purge any legacy localStorage admin keys
+      localStorage.removeItem('admin_authenticated');
+      localStorage.removeItem('admin_email');
+
+      const isAuth = sessionStorage.getItem('admin_authenticated') === 'true';
+      const email = sessionStorage.getItem('admin_email');
 
       if (!isAuth || !email || !ADMIN_EMAILS.includes(email.toLowerCase())) {
         setIsAuthenticated(false);
@@ -43,7 +52,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   if (!isAuthenticated) {
-    return null;
+    return (
+      <div className="min-h-screen bg-[#FAF4E8] flex items-center justify-center text-xs text-gray-500">
+        Authenticating admin session...
+      </div>
+    );
   }
 
   return (

@@ -131,14 +131,16 @@ export const useAppStore = create<AppState>()(
       clearSession: () => {
         // Wipe in-memory state
         set({ cart: [], wishlist: [], appliedCoupon: null, authUser: null });
-        // Also nuke the persisted localStorage entry so badges are 0 after reload
+        // Also nuke persisted storage entries
         if (typeof window !== 'undefined') {
+          sessionStorage.removeItem('admin_email');
+          sessionStorage.removeItem('admin_authenticated');
           localStorage.removeItem('loops-of-love-storage');
           localStorage.removeItem('user_email');
           localStorage.removeItem('user_name');
           localStorage.removeItem('admin_email');
           localStorage.removeItem('admin_authenticated');
-          document.cookie = 'admin_session=; path=/; max-age=0';
+          document.cookie = 'admin_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
         }
       },
 
