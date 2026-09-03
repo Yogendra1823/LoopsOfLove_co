@@ -7,7 +7,7 @@ import { Search, Heart, ShoppingBag, Menu, X, User, Sparkles, Lock, LogOut } fro
 import { useAppStore } from '@/lib/store';
 import { signOut } from '@/lib/supabase';
 
-const ADMIN_EMAILS = ['medarametlayogendra@gmail.com', 'loopsoflove@gmail.com'];
+const ADMIN_EMAILS = ['medarametlayogendra@gmail.com', 'loopsoflove.co3@gmail.com'];
 
 export function Header() {
   const router = useRouter();

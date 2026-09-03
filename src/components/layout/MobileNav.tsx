@@ -7,7 +7,7 @@ import { X, Search, Phone, Sparkles, User, Lock, Heart, Package, LogOut, ShieldC
 import { useAppStore } from '@/lib/store';
 import { signOut } from '@/lib/supabase';
 
-const ADMIN_EMAILS = ['medarametlayogendra@gmail.com', 'loopsoflove@gmail.com'];
+const ADMIN_EMAILS = ['medarametlayogendra@gmail.com', 'loopsoflove.co3@gmail.com'];
 
 export function MobileNav() {
   const router = useRouter();

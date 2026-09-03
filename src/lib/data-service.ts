@@ -149,7 +149,7 @@ export async function getCategories(): Promise<Category[]> {
 
 const ORDERS_STORAGE_KEY = 'loops-of-love-orders';
 
-const ADMIN_EMAILS = ['medarametlayogendra@gmail.com', 'loopsoflove@gmail.com'];
+const ADMIN_EMAILS = ['medarametlayogendra@gmail.com', 'loopsoflove.co3@gmail.com'];
 
 function getLocalOrders(): Order[] {
   if (typeof window === 'undefined') return [];

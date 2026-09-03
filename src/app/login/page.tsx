@@ -10,10 +10,10 @@ import { useAppStore } from '@/lib/store';
 
 const ADMIN_CREDENTIALS: Record<string, string> = {
   'medarametlayogendra@gmail.com': 'Sunny=2305',
-  'loopsoflove@gmail.com': 'Loops@Love5656',
+  'loopsoflove.co3@gmail.com': 'Loops@Love5656',
 };
 
-const ADMIN_EMAILS = ['medarametlayogendra@gmail.com', 'loopsoflove@gmail.com'];
+const ADMIN_EMAILS = ['medarametlayogendra@gmail.com', 'loopsoflove.co3@gmail.com'];
 
 function LoginContent() {
   const router = useRouter();

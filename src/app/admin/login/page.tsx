@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button';
 
 const ALLOWED_ADMINS: Record<string, string> = {
   'medarametlayogendra@gmail.com': 'Sunny=2305',
-  'loopsoflove@gmail.com': 'Loops@Love5656',
+  'loopsoflove.co3@gmail.com': 'Loops@Love5656',
 };
 
 export default function AdminLoginPage() {
@@ -75,7 +75,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="medarametlayogendra@gmail.com or loopsoflove@gmail.com"
+                placeholder="medarametlayogendra@gmail.com or loopsoflove.co3@gmail.com"
                 className="w-full px-3.5 py-2.5 text-xs bg-[#FAF4E8] border border-[#E8DEC9] rounded-xl focus:outline-none focus:border-[#C86D51]"
               />
             </div>
